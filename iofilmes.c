@@ -398,7 +398,13 @@ mostreFilme(Filme *flm)
 void 
 mostreListaFilmes(ListaFilmes *lst)
 {
-    Filme *aux = lst->cab->prox;
+    Filme *aux = NULL;
+    if(lst == NULL || lst->nFilmes == 0)
+    {
+        AVISO(Lista de filmes vazia!);
+        return;
+    }
+    aux = lst->cab->prox;
     while(aux != lst->cab)
     {
         mostreFilme(aux);
@@ -425,13 +431,15 @@ mostreListaFilmes(ListaFilmes *lst)
 void 
 mostreMelhoresFilmes(ListaFilmes *lst)
 {
-    int i, N, X, V;
+    int i, N, V;
+    float X;
     Filme *aux;
-    i = N = X = V = 0;
+    i = N = V = 0;
+    X = 0.0;
     printf("Digite o numero de filmes: ");
     scanf("%d", &N);
     printf("Digite a nota maxima: ");
-    scanf("%d", &X);
+    scanf("%f", &X);
     printf("Digite o numero minimo de votos: ");
     scanf("%d", &V);
     aux = lst->cab->ant;
@@ -441,7 +449,7 @@ mostreMelhoresFilmes(ListaFilmes *lst)
     }
     if(aux == lst->cab)
     {
-        printf("Nenhum filme na lista com nota menor que %d!\n", X);
+        printf("Nenhum filme na lista com nota menor que %f!\n", X);
         return;
     }
     /*aux agora contem o filme de maior nota menor que X*/
@@ -480,13 +488,15 @@ mostrePioresFilmes(ListaFilmes *lst)
 {
     /*Funcao segue mesmo padrao da mostreMelhoresFilmes, apenas invertendo a
       ordem em que a lista e' varrida e algumas comparacoes*/
-    int i, N, X, V;
+    int i, N, V;
+    float X;
     Filme *aux;
-    i = N = X = V = 0;
+    i = N = V = 0;
+    X = 0.0;
     printf("Digite o numero de filmes: ");
     scanf("%d", &N);
     printf("Digite a nota minima: ");
-    scanf("%d", &X);
+    scanf("%f", &X);
     printf("Digite o numero minimo de votos: ");
     scanf("%d", &V);
     aux = lst->cab->prox;
@@ -496,7 +506,7 @@ mostrePioresFilmes(ListaFilmes *lst)
     }
     if(aux == lst->cab)
     {
-        printf("Nenhum filme na lista com nota maior que %d!\n", X);
+        printf("Nenhum filme na lista com nota maior que %f!\n", X);
         return;
     }
     /*aux agora contem o filme de menor nota maior que X*/

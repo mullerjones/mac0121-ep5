@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
         case PROCURAR:
         {
             char *termo = mallocSafe(TAM_STR * sizeof(char));
-            int tamTermo = 0, tamNome = 0;
+            int tamTermo = 0;
             Bool terminou = FALSE, achouAlgum = FALSE;
             Filme *aux = NULL;
 
@@ -111,6 +111,7 @@ int main(int argc, char *argv[])
             aux = lst->cab->prox;
             while (!terminou)
             {
+                opcao = 'p';
                 if (aux == lst->cab && achouAlgum == FALSE)
                 {
                     printf("Nenhum filme encontrado com o termo digitado!\n");
@@ -121,7 +122,7 @@ int main(int argc, char *argv[])
                     achouAlgum = TRUE;
                     mostreFilme(aux);
                     printf("Esse e' o filme procurado? [s/n/x] (x para sair): ");
-                    scanf("%c", &opcao);
+                    leiaString(&opcao, 1);
                     if (opcao == 's' || opcao == 'x')
                     {
                         terminou = TRUE;
@@ -195,7 +196,7 @@ int main(int argc, char *argv[])
         case REMOVER:
         {
             char *termo = mallocSafe(TAM_STR * sizeof(char));
-            int tamTermo = 0, tamNome = 0;
+            int tamTermo = 0;
             Bool terminou = FALSE, achouAlgum = FALSE;
             Filme *aux = NULL;
 
@@ -221,7 +222,7 @@ int main(int argc, char *argv[])
                     achouAlgum = TRUE;
                     mostreFilme(aux);
                     printf("Esse e' o filme procurado? [s/n/x] (x para sair): ");
-                    scanf("%c", &opcao);
+                    leiaString(&opcao, 1);
                     if (opcao == 'x')
                     {
                         terminou = TRUE;
@@ -277,18 +278,23 @@ int main(int argc, char *argv[])
         /*---------------------------------------------*/
         case MOSTRAR_MENOR:
         {
+            mostrePioresFilmes(lst);
             break;
         }
 
         /*---------------------------------------------*/
         case MOSTRAR_MAIOR:
         {
+            mostreMelhoresFilmes(lst);
             break;
         }
 
         /*---------------------------------------------*/
         case LIMPAR:
         {
+            libereListaFilmes(lst);
+            lst = NULL;
+            printf("Lista de filmes limpa!\n");
             break;
         }
 

@@ -111,6 +111,7 @@ crieListaFilmes()
 void libereListaFilmes(ListaFilmes *lst)
 {
     Filme *pont;
+    if(lst == NULL) return;
     while (lst->nFilmes > 0)
     {
         pont = extraiFilme(lst, lst->cab->prox);
@@ -118,7 +119,9 @@ void libereListaFilmes(ListaFilmes *lst)
         pont = NULL;
     }
     free(lst->cab);
+    lst->cab = NULL;
     free(lst);
+    lst = NULL;
     return;
 }
 
@@ -327,11 +330,13 @@ void mergeSortFilmes(ListaFilmes *lst, Criterio criterio)
             {
                 pont = extraiFilme(aux2, aux2->cab->prox);
                 insiraFilme(lst, pont);
+                break;
             }
             if (aux2->nFilmes == 0)
             {
                 pont = extraiFilme(aux1, aux1->cab->prox);
                 insiraFilme(lst, pont);
+                break;
             }
             if (strCmp(aux1->cab->prox->nome, aux2->cab->prox->nome) < 0)
             {
