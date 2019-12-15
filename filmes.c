@@ -131,8 +131,6 @@ void libereListaFilmes(ListaFilmes *lst)
  */
 void libereFilme(Filme *flm)
 {
-    flm->prox->ant = flm->ant;
-    flm->ant->prox = flm->prox;
     free(flm->nome);
     free(flm);
     flm = NULL;
@@ -151,10 +149,10 @@ void libereFilme(Filme *flm)
  */
 void insiraFilme(ListaFilmes *lst, Filme *flm)
 {
-    flm->prox = lst->cab->prox;
-    flm->prox->ant = flm;
-    lst->cab->prox = flm;
-    flm->ant = lst->cab;
+    flm->prox = lst->cab;
+    flm->ant = lst->cab->ant;
+    lst->cab->ant = flm;
+    flm->ant->prox = flm;
     lst->nFilmes++;
     return;
 }
@@ -312,7 +310,7 @@ void mergeSortFilmes(ListaFilmes *lst, Criterio criterio)
                 break;
             }
                 
-            if (aux1->cab->prox->nota > aux2->cab->prox->nota)
+            if (aux1->cab->prox->nota < aux2->cab->prox->nota)
             {
                 pont = extraiFilme(aux1, aux1->cab->prox);
                 insiraFilme(lst, pont);
