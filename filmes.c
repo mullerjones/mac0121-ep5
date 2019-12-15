@@ -39,6 +39,11 @@
 #include "st.h" /* freeST(), initST(), putFilmeST(), getFilmeST(),
                         showST(), freeST() */
 
+
+/*Declaracao da funcao auxiliar criada*/
+Filme *extraiFilme(ListaFilmes *lst, Filme *flm);
+
+
 /*----------------------------------------------------------------------
  *  crieFilme
  *
@@ -105,12 +110,14 @@ crieListaFilmes()
 
 void libereListaFilmes(ListaFilmes *lst)
 {
-    AVISO(libereListaFilmes em filmes.c
-          : Vixe !Ainda nao fiz essa funcao...);
-    while (lst->cab != NULL)
+    Filme *pont;
+    while (lst->nFilmes > 0)
     {
-        libereFilme(lst->cab->prox);
+        pont = extraiFilme(lst, lst->cab->prox);
+        libereFilme(pont);
+        pont = NULL;
     }
+    free(lst->cab);
     free(lst);
     return;
 }
@@ -148,6 +155,7 @@ void insiraFilme(ListaFilmes *lst, Filme *flm)
     flm->prox->ant = flm;
     lst->cab->prox = flm;
     flm->ant = lst->cab;
+    lst->nFilmes++;
     return;
 }
 
@@ -262,7 +270,90 @@ void removaFilme(ListaFilmes *lst, Filme *flm)
  */
 void mergeSortFilmes(ListaFilmes *lst, Criterio criterio)
 {
-    AVISO(mergeSortFilmes em filmes.c: Vixe ainda nao fiz essa funcao...);
+    ListaFilmes *aux1, *aux2;
+    Filme *pont = NULL;
+    int i, nFilmes = lst->nFilmes;
+    if (lst->nFilmes == 1)
+        return;
+    aux1 = crieListaFilmes();
+    aux2 = crieListaFilmes();
+    for (i = 0; i < nFilmes / 2; i++)
+    {
+        /*Insere os primeiros nFilmes/2 na lista aux1*/
+        pont = extraiFilme(lst, lst->cab->prox);
+        insiraFilme(aux1, pont);
+    }
+    while (lst->nFilmes > 0)
+    {
+        /*Insere os outros em aux2*/
+        pont = extraiFilme(lst, lst->cab->prox);
+        insiraFilme(aux2, pont);
+    }
+    mergeSortFilmes(aux1, criterio); /*Aplica a recursao*/
+    mergeSortFilmes(aux2, criterio);
+
+    /*Da merge nas 2 listas*/
+    while (aux1->nFilmes > 0 || aux2->nFilmes > 0)
+    {
+        switch (criterio)
+        {
+        case NOTA:
+            if (aux1->nFilmes == 0)
+            {
+                pont = extraiFilme(aux2, aux2->cab->prox);
+                insiraFilme(lst, pont);
+                break;
+            }
+                
+            if (aux2->nFilmes == 0)
+            {
+                pont = extraiFilme(aux1, aux1->cab->prox);
+                insiraFilme(lst, pont);
+                break;
+            }
+                
+            if (aux1->cab->prox->nota > aux2->cab->prox->nota)
+            {
+                pont = extraiFilme(aux1, aux1->cab->prox);
+                insiraFilme(lst, pont);
+            }
+            else
+            {
+                pont = extraiFilme(aux2, aux2->cab->prox);
+                insiraFilme(lst, pont);
+            }
+            break;
+
+        case NOME:
+            if (aux1->nFilmes == 0)
+            {
+                pont = extraiFilme(aux2, aux2->cab->prox);
+                insiraFilme(lst, pont);
+            }
+            if (aux2->nFilmes == 0)
+            {
+                pont = extraiFilme(aux1, aux1->cab->prox);
+                insiraFilme(lst, pont);
+            }
+            if (strCmp(aux1->cab->prox->nome, aux2->cab->prox->nome) < 0)
+            {
+                pont = extraiFilme(aux1, aux1->cab->prox);
+                insiraFilme(lst, pont);
+            }
+            else
+            {
+                pont = extraiFilme(aux2, aux2->cab->prox);
+                insiraFilme(lst, pont);
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    libereListaFilmes(aux1);
+    libereListaFilmes(aux2);
 }
 
 /*----------------------------------------------------------------------
@@ -299,7 +390,8 @@ void mergeSortFilmes(ListaFilmes *lst, Criterio criterio)
  */
 void quickSortFilmes(ListaFilmes *lst, Criterio criterio)
 {
-    AVISO(quickSortFilmes em filmes.c: Vixe ainda nao fiz essa funcao...);
+    AVISO(quickSortFilmes em filmes.c
+          : Vixe ainda nao fiz essa funcao...);
 }
 
 /*----------------------------------------------------------------------
@@ -329,5 +421,17 @@ void quickSortFilmes(ListaFilmes *lst, Criterio criterio)
  */
 void hashFilmes(ListaFilmes *lst)
 {
-    AVISO(hashFilmes em filmes.c: Vixe ainda nao fiz essa funcao...);
+    AVISO(hashFilmes em filmes.c
+          : Vixe ainda nao fiz essa funcao...);
+}
+
+/*Extrai um filme de uma lista e retorna seu endereco*/
+Filme *extraiFilme(ListaFilmes *lst, Filme *flm)
+{
+    flm->prox->ant = flm->ant;
+    flm->ant->prox = flm->prox;
+    flm->prox = NULL;
+    flm->ant = NULL;
+    lst->nFilmes--;
+    return flm;
 }

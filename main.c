@@ -46,6 +46,8 @@
 /* A funcao leiaOpcao so e usada neste arquivo. */
 static char leiaOpcao();
 
+
+
 /*------------------------------------------------------------------- 
   M A I N 
 */
@@ -114,7 +116,7 @@ int main(int argc, char *argv[])
                     printf("Nenhum filme encontrado com o termo digitado!\n");
                     terminou = TRUE;
                 }
-                else if (achePalavra(termo, tamTermo, aux->nome, strlen(aux->nome)))
+                else if (achePalavra((unsigned char *) termo, tamTermo, (unsigned char *) aux->nome, strlen(aux->nome)))
                 {
                     achouAlgum = TRUE;
                     mostreFilme(aux);
@@ -192,18 +194,64 @@ int main(int argc, char *argv[])
         /*---------------------------------------------*/
         case REMOVER:
         {
+            char *termo = mallocSafe(TAM_STR * sizeof(char));
+            int tamTermo = 0, tamNome = 0;
+            Bool terminou = FALSE, achouAlgum = FALSE;
+            Filme *aux = NULL;
+
+            printf("Digite parte do nome do filme a ser procurado: ");
+            tamTermo = leiaString(termo, TAM_STR);
+            aux = lst->cab->prox;
+            while (!terminou)
+            {
+                if (aux == lst->cab)
+                {
+                    if (achouAlgum == FALSE)
+                    {
+                        printf("Nenhum filme encontrado com o termo digitado!\n");
+                    }
+                    else
+                    {
+                        printf("Nenhum outro filme encontrado com o termo digitado!\n");
+                    }
+                    terminou = TRUE;
+                }
+                else if (achePalavra((unsigned char *) termo, tamTermo, (unsigned char *) aux->nome, strlen(aux->nome)))
+                {
+                    achouAlgum = TRUE;
+                    mostreFilme(aux);
+                    printf("Esse e' o filme procurado? [s/n/x] (x para sair): ");
+                    scanf("%c", &opcao);
+                    if (opcao == 'x')
+                    {
+                        terminou = TRUE;
+                    }
+                    else if(opcao == 's')
+                    {
+                        removaFilme(lst, aux);
+                        printf("Filme removido.\n");
+                        terminou = TRUE;
+                    }
+                }
+                aux = aux->prox;
+            }
+            free(termo);
             break;
         }
 
         /*---------------------------------------------*/
         case ORDENAR_NOTA_M:
         {
+            mergeSortFilmes(lst, NOTA);
+            printf("Lista ordenada!\n");
             break;
         }
 
         /*---------------------------------------------*/
         case ORDENAR_NOME_M:
         {
+            mergeSortFilmes(lst, NOME);
+            printf("Lista ordenada!\n");
             break;
         }
 
@@ -222,6 +270,7 @@ int main(int argc, char *argv[])
         /*---------------------------------------------*/
         case MOSTRAR:
         {
+            mostreListaFilmes(lst);
             break;
         }
 
@@ -246,6 +295,7 @@ int main(int argc, char *argv[])
         /*---------------------------------------------*/
         case SAIR:
         {
+            libereListaFilmes(lst);
             break;
         }
 

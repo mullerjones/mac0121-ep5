@@ -60,7 +60,20 @@
 Bool
 achePalavra(unsigned char *pal, int tPal, unsigned char *texto, int tTex)
 {
-    AVISO(achePalavra em util.c: Vixe! Ainda nao fiz essa funcao...);
+    int i, j;
+    int offset = 'A' - 'a';
+    for(i=0;i<tTex;i++)
+    {
+        for(j=0;j<tPal&&i+j<tTex;j++)
+        {
+            if(texto[i+j]!=pal[j] && texto[i+j] != pal[j]+offset && texto[i+j] != pal[j] - offset) break;
+            else if (j==tPal-1)
+            {
+                return TRUE;
+            }
+            
+        }
+    }
     return FALSE;
 }
 
