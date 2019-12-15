@@ -10,8 +10,8 @@
   SUA DISTRIBUIÇÃO. ESTOU CIENTE QUE OS CASOS DE PLÁGIO SÃO PUNIDOS COM 
   REPROVAÇÃO DIRETA NA DISCIPLINA.
 
-  Nome:
-  NUSP:
+  Nome: Alexandre Muller Jones
+  NUSP: 8038149
 
   IMDB: iofilmes.c
 
@@ -398,7 +398,12 @@ mostreFilme(Filme *flm)
 void 
 mostreListaFilmes(ListaFilmes *lst)
 {
-    AVISO(mostreListaFilmes:  Vixe ainda nao fiz essa funcao...);
+    Filme *aux = lst->cab->prox;
+    while(aux != lst->cab)
+    {
+        mostreFilme(aux);
+        aux = aux->prox;
+    }
 }
 
 /*----------------------------------------------------------------------
@@ -420,7 +425,38 @@ mostreListaFilmes(ListaFilmes *lst)
 void 
 mostreMelhoresFilmes(ListaFilmes *lst)
 {
-    AVISO(mostreMelhores:  Vixe ainda nao fiz essa funcao...);
+    int i, N, X, V;
+    Filme *aux;
+    i = N = X = V = 0;
+    printf("Digite o numero de filmes: ");
+    scanf("%d", &N);
+    printf("Digite a nota maxima: ");
+    scanf("%d", &X);
+    printf("Digite o numero minimo de votos: ");
+    scanf("%d", &V);
+    aux = lst->cab->ant;
+    while(aux->nota>X && aux!=lst->cab)
+    {
+        aux = aux->ant;
+    }
+    if(aux == lst->cab)
+    {
+        printf("Nenhum filme na lista com nota menor que %d!\n", X);
+        return;
+    }
+    /*aux agora contem o filme de maior nota menor que X*/
+    while(i<N && aux!=lst->cab)
+    {
+        if(aux->votos>V)
+        {
+            mostreFilme(aux);
+            i++;
+        }
+        aux = aux->ant;
+    }
+    if(aux == lst->cab) printf("Apenas %d filmes encontrados com esses criterios!\n", i);
+    return;
+
 }
 
 /*----------------------------------------------------------------------
@@ -442,5 +478,37 @@ mostreMelhoresFilmes(ListaFilmes *lst)
 void 
 mostrePioresFilmes(ListaFilmes *lst)
 {
-    AVISO(mostrePiores:  Vixe ainda nao fiz essa funcao...);
+    /*Funcao segue mesmo padrao da mostreMelhoresFilmes, apenas invertendo a
+      ordem em que a lista e' varrida e algumas comparacoes*/
+    int i, N, X, V;
+    Filme *aux;
+    i = N = X = V = 0;
+    printf("Digite o numero de filmes: ");
+    scanf("%d", &N);
+    printf("Digite a nota minima: ");
+    scanf("%d", &X);
+    printf("Digite o numero minimo de votos: ");
+    scanf("%d", &V);
+    aux = lst->cab->prox;
+    while(aux->nota<X && aux!=lst->cab)
+    {
+        aux = aux->prox;
+    }
+    if(aux == lst->cab)
+    {
+        printf("Nenhum filme na lista com nota maior que %d!\n", X);
+        return;
+    }
+    /*aux agora contem o filme de menor nota maior que X*/
+    while(i<N && aux!=lst->cab)
+    {
+        if(aux->votos>V)
+        {
+            mostreFilme(aux);
+            i++;
+        }
+        aux = aux->prox;
+    }
+    if(aux == lst->cab) printf("Apenas %d filmes encontrados com esses criterios!\n", i);
+    return;
 }

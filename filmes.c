@@ -10,8 +10,8 @@
   SUA DISTRIBUIÇÃO. ESTOU CIENTE QUE OS CASOS DE PLÁGIO SÃO PUNIDOS COM 
   REPROVAÇÃO DIRETA NA DISCIPLINA.
 
-  Nome:
-  NUSP:
+  Nome: Alexandre Muller Jones
+  NUSP: 8038149
 
   IMDB: filmes.c
 
@@ -25,19 +25,18 @@
   \__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__
 */
 
-
 /*----------------------------------------------------------*/
 /* filmes.h e a interface para as funcoes neste modulo      */
-#include "filmes.h" 
+#include "filmes.h"
 
 /*----------------------------------------------------------*/
-#include <stdlib.h>  /* NULL, free() */
-#include <stdio.h>   /* printf(), scanf() */ 
-#include <string.h>  /* strlen(), strncpy(), strcmp(), strtok() */
+#include <stdlib.h> /* NULL, free() */
+#include <stdio.h>  /* printf(), scanf() */
+#include <string.h> /* strlen(), strncpy(), strcmp(), strtok() */
 
-#include "util.h"    /* Bool, mallocSafe() */
+#include "util.h" /* Bool, mallocSafe() */
 #include "iofilmes.h"
-#include "st.h"      /* freeST(), initST(), putFilmeST(), getFilmeST(),
+#include "st.h" /* freeST(), initST(), putFilmeST(), getFilmeST(),
                         showST(), freeST() */
 
 /*----------------------------------------------------------------------
@@ -54,25 +53,25 @@
  *  A funcao retorna o endereco da celula criada.
  */
 Filme *
-crieFilme (char dist[], int votos, float nota, char *nome, int ano)
+crieFilme(char dist[], int votos, float nota, char *nome, int ano)
 {
     Filme *flm;
-    int    len = strlen(nome) + 1; /* +1 para o '\0' */
-    
+    int len = strlen(nome) + 1; /* +1 para o '\0' */
+
     flm = mallocSafe(sizeof *flm);
-    
-    strncpy(flm->dist, dist, TAM_DIST+1); /* +1 para o '\0' */
-    
+
+    strncpy(flm->dist, dist, TAM_DIST + 1); /* +1 para o '\0' */
+
     flm->votos = votos;
-    flm->nota  = nota;
-    
-    flm->nome = mallocSafe(len*sizeof(char));
+    flm->nota = nota;
+
+    flm->nome = mallocSafe(len * sizeof(char));
     strncpy(flm->nome, nome, len);
-    
-    flm->ano  = ano;
+
+    flm->ano = ano;
 
     flm->prox = flm->ant = NULL; /* paranoia */
-    
+
     return flm;
 }
 
@@ -88,8 +87,11 @@ crieFilme (char dist[], int votos, float nota, char *nome, int ano)
 ListaFilmes *
 crieListaFilmes()
 {
-    AVISO(crieListaFilmes em filmes.c: Vixe! Ainda nao fiz essa funcao ...); 
-    return NULL;
+    ListaFilmes *lst = mallocSafe(sizeof(ListaFilmes));
+    lst->cab = mallocSafe(sizeof(Filme));
+    lst->cab->prox = lst->cab->ant = lst->cab;
+    lst->nFilmes = 0;
+    return lst;
 }
 
 /*----------------------------------------------------------------------
@@ -101,10 +103,16 @@ crieListaFilmes()
  *  Esta funcao utiliza a funcao libereFilme().
  */
 
-void
-libereListaFilmes(ListaFilmes *lst)
+void libereListaFilmes(ListaFilmes *lst)
 {
-    AVISO(libereListaFilmes em filmes.c: Vixe! Ainda nao fiz essa funcao...);
+    AVISO(libereListaFilmes em filmes.c
+          : Vixe !Ainda nao fiz essa funcao...);
+    while (lst->cab != NULL)
+    {
+        libereFilme(lst->cab->prox);
+    }
+    free(lst);
+    return;
 }
 
 /*----------------------------------------------------------------------
@@ -114,10 +122,14 @@ libereListaFilmes(ListaFilmes *lst)
  *  filme e libera a area alocada.
  *
  */
-void 
-libereFilme(Filme *flm)
+void libereFilme(Filme *flm)
 {
-    AVISO(libereFilme em filmes.c: Vixe! Ainda nao fiz essa funcao...);
+    flm->prox->ant = flm->ant;
+    flm->ant->prox = flm->prox;
+    free(flm->nome);
+    free(flm);
+    flm = NULL;
+    return;
 }
 
 /*----------------------------------------------------------------------
@@ -130,12 +142,14 @@ libereFilme(Filme *flm)
  *  A funcao insere o filme na lista.
  *  
  */
-void 
-insiraFilme(ListaFilmes *lst, Filme *flm)
+void insiraFilme(ListaFilmes *lst, Filme *flm)
 {
-    AVISO(insiraFilme em filmes.c: Vixe! Ainda nao fiz essa funcao...);
+    flm->prox = lst->cab->prox;
+    flm->prox->ant = flm;
+    lst->cab->prox = flm;
+    flm->ant = lst->cab;
+    return;
 }
-
 
 /*---------------------------------------------------------------------
  *  contemFilme
@@ -158,10 +172,26 @@ insiraFilme(ListaFilmes *lst, Filme *flm)
  *  ou a funcao strCmp (util.h).
  *
  */
-Bool 
-contemFilme(ListaFilmes *lst, Filme *flm)
+Bool contemFilme(ListaFilmes *lst, Filme *flm)
 {
-    AVISO(contemFilme em filme.c: Vixe! Ainda nao fiz essa funcao...);
+    Filme *aux = lst->cab->prox;
+    while (aux != lst->cab)
+    {
+        if (aux->nota == flm->nota)
+        {
+            if (aux->ano == flm->ano)
+            {
+                if (!strCmp(aux->nome, flm->nome))
+                {
+                    return TRUE;
+                }
+            }
+        }
+        else
+        {
+            aux = aux->prox;
+        }
+    }
     return FALSE;
 }
 
@@ -173,10 +203,29 @@ contemFilme(ListaFilmes *lst, Filme *flm)
  *  Pre-condicao: a funcao supoe que o filme FLM esta 
  *                na lista LST.
  */
-void 
-removaFilme(ListaFilmes *lst, Filme *flm)
+void removaFilme(ListaFilmes *lst, Filme *flm)
 {
-    AVISO(removaFilme em filmes.c: Vixe! Ainda nao fiz essa funcao...);
+    Filme *aux = lst->cab->prox;
+    while (aux != lst->cab)
+    {
+        if (aux->nota == flm->nota)
+        {
+            if (aux->ano == flm->ano)
+            {
+                if (!strCmp(aux->nome, flm->nome))
+                {
+                    break;
+                }
+            }
+        }
+        else
+        {
+            aux = aux->prox;
+        }
+    }
+    /*Nesse ponto, aux contem o apontador para o filme*/
+    libereFilme(aux);
+    return;
 }
 
 /*----------------------------------------------------------------------
@@ -211,10 +260,9 @@ removaFilme(ListaFilmes *lst, Filme *flm)
  *  ------------------------------------------------------------------
  *  Para ordenar por nome, veja a funcao strCmp em util.[h|c].
  */
-void 
-mergeSortFilmes(ListaFilmes *lst, Criterio criterio)
+void mergeSortFilmes(ListaFilmes *lst, Criterio criterio)
 {
-    AVISO(mergeSortFilmes em filmes.c:  Vixe ainda nao fiz essa funcao...);
+    AVISO(mergeSortFilmes em filmes.c: Vixe ainda nao fiz essa funcao...);
 }
 
 /*----------------------------------------------------------------------
@@ -249,8 +297,7 @@ mergeSortFilmes(ListaFilmes *lst, Criterio criterio)
  *  ------------------------------------------------------------------
  *  Para ordenar por nome, veja a funcao strCmp em util.[h|c].
  */
-void 
-quickSortFilmes(ListaFilmes *lst, Criterio criterio)
+void quickSortFilmes(ListaFilmes *lst, Criterio criterio)
 {
     AVISO(quickSortFilmes em filmes.c: Vixe ainda nao fiz essa funcao...);
 }
@@ -280,9 +327,7 @@ quickSortFilmes(ListaFilmes *lst, Criterio criterio)
  *      http://linux.die.net/man/3/strtok    (man page)
  *
  */
-void
-hashFilmes(ListaFilmes *lst)
+void hashFilmes(ListaFilmes *lst)
 {
     AVISO(hashFilmes em filmes.c: Vixe ainda nao fiz essa funcao...);
 }
-

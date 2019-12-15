@@ -10,8 +10,8 @@
   SUA DISTRIBUIÇÃO. ESTOU CIENTE QUE OS CASOS DE PLÁGIO SÃO PUNIDOS COM 
   REPROVAÇÃO DIRETA NA DISCIPLINA.
 
-  Nome:
-  NUSP:
+  Nome: Alexandre Muller Jones
+  NUSP: 8038149
 
   IMDB: main.c 
 
@@ -25,9 +25,9 @@
   \__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__\__
 */
 
-
-#include <stdio.h>  /* printf(), scanf() */ 
+#include <stdio.h>  /* printf(), scanf() */
 #include <time.h>   /* CLOCKS_PER_SECOND */
+#include <string.h> /* strlen()     */
 
 #include "main.h"
 
@@ -44,17 +44,15 @@
 */
 
 /* A funcao leiaOpcao so e usada neste arquivo. */
-static char  leiaOpcao(); 
-
+static char leiaOpcao();
 
 /*------------------------------------------------------------------- 
   M A I N 
 */
-int 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-    ListaFilmes *lst = crieListaFilmes(); 
-    char         opcao;
+    ListaFilmes *lst = crieListaFilmes();
+    char opcao;
     clock_t start, end; /* usadas para medir tempo de processamento */
     double elapsed;
     /* declaracao das demais variaveis do main */
@@ -67,29 +65,29 @@ main(int argc, char *argv[])
 
     /*-----------------------------------------------------*/
     /* iterara ate o usuario digitar 'x' para sair         */
-    do 
-    { 
+    do
+    {
 
         opcao = leiaOpcao();
 
         /* comeca a cronometrar */
-        start = clock(); 
+        start = clock();
 
-        switch (opcao) 
+        switch (opcao)
         {
             /*---------------------------------------------*/
         case CARREGAR_SER:
         {
-            carregueListaFilmes(lst,FALSE);
+            carregueListaFilmes(lst, FALSE);
             break;
-        }  
+        }
 
         /*---------------------------------------------*/
         case CARREGAR_ER:
         {
-            carregueListaFilmes(lst,TRUE);
+            carregueListaFilmes(lst, TRUE);
             break;
-        }  
+        }
 
         /*---------------------------------------------*/
         case GRAVAR:
@@ -101,6 +99,35 @@ main(int argc, char *argv[])
         /*---------------------------------------------*/
         case PROCURAR:
         {
+            char *termo = mallocSafe(TAM_STR * sizeof(char));
+            int tamTermo = 0, tamNome = 0;
+            Bool terminou = FALSE, achouAlgum = FALSE;
+            Filme *aux = NULL;
+
+            printf("Digite parte do nome do filme a ser procurado: ");
+            tamTermo = leiaString(termo, TAM_STR);
+            aux = lst->cab->prox;
+            while (!terminou)
+            {
+                if (aux == lst->cab && achouAlgum == FALSE)
+                {
+                    printf("Nenhum filme encontrado com o termo digitado!\n");
+                    terminou = TRUE;
+                }
+                else if (achePalavra(termo, tamTermo, aux->nome, strlen(aux->nome)))
+                {
+                    achouAlgum = TRUE;
+                    mostreFilme(aux);
+                    printf("Esse e' o filme procurado? [s/n/x] (x para sair): ");
+                    scanf("%c", &opcao);
+                    if (opcao == 's' || opcao == 'x')
+                    {
+                        terminou = TRUE;
+                    }
+                }
+                aux = aux->prox;
+            }
+            free(termo);
             break;
         }
 
@@ -131,13 +158,13 @@ main(int argc, char *argv[])
         /*---------------------------------------------*/
         case INSERIR:
         {
-            Filme       *flm = NULL;      
+            Filme *flm = NULL;
 
-            char  dist[TAM_DIST+1];  
-            int   votos;             
-            float nota;              
-            char  nome[TAM_STR+1];   
-            int   ano;               
+            char dist[TAM_DIST + 1];
+            int votos;
+            float nota;
+            char nome[TAM_STR + 1];
+            int ano;
 
             printf("Digite o nome do filme: ");
             leiaString(nome, TAM_STR);
@@ -148,16 +175,17 @@ main(int argc, char *argv[])
             printf("Digite a nota: ");
             scanf("%f", &nota);
 
-            printf("Digite o numero de votos: "); 
+            printf("Digite o numero de votos: ");
             scanf("%d", &votos);
 
             printf("Digite a distribuicao: ");
-            leiaString(dist, TAM_DIST+1);
-   
+            leiaString(dist, TAM_DIST + 1);
+
             flm = crieFilme(dist, votos, nota, nome, ano);
             mostreFilme(flm);
-            
-            /* completar essa opcao */
+
+            insiraFilme(lst, flm);
+            printf("Filme inserido na lista de filmes.\n");
             break;
         }
 
@@ -208,7 +236,7 @@ main(int argc, char *argv[])
         {
             break;
         }
-      
+
         /*---------------------------------------------*/
         case LIMPAR:
         {
@@ -221,28 +249,26 @@ main(int argc, char *argv[])
             break;
         }
 
-        default :
+        default:
         {
             printf("main: opcao '%c' nao reconhecida\n", opcao);
             break;
         }
-        
-        } /* switch */
-        
-        /* trava o cronometro */  
-        end = clock();
-        
-        /* calcula o tempo */
-        elapsed = ((double) (end - start)) / CLOCKS_PER_SEC;
-        printf("\n(%g segundos)\n", elapsed);
-    } 
-    while (opcao != SAIR);
 
-    freeST(); 
+        } /* switch */
+
+        /* trava o cronometro */
+        end = clock();
+
+        /* calcula o tempo */
+        elapsed = ((double)(end - start)) / CLOCKS_PER_SEC;
+        printf("\n(%g segundos)\n", elapsed);
+    } while (opcao != SAIR);
+
+    freeST();
 
     return 0;
 }
-
 
 /*---------------------------------------------------------------------
   leiaOpcao()
@@ -250,11 +276,10 @@ main(int argc, char *argv[])
   Le e retorna o caractere correspondente a opcao do usuario.
 */
 
-char 
-leiaOpcao()
+char leiaOpcao()
 {
     char opcao;
-    char listaOpcoes1[] = 
+    char listaOpcoes1[] =
         "\n================================================"
         "======================\n"
         "  (c) carregar um arquivo de dados sem eliminar repeticoes\n"
@@ -267,7 +292,7 @@ leiaOpcao()
         "  (L) limpar   a  TS (opcional)\n"
         "  (i) inserir  um filme\n"
         "  (r) remover  um filme\n";
-    char listaOpcoes2[] = 
+    char listaOpcoes2[] =
         "  (o) ordenar  a lista de filmes por nota (mergeSort)\n"
         "  (O) ordenar  a lista de filmes por nome (mergeSort)\n"
         "  (q) ordenar  a lista de filmes por nota (quickSort, opcional)\n"
@@ -278,8 +303,8 @@ leiaOpcao()
         "  (l) limpar   a lista de filmes\n"
         "  (x) sair     do programa\n\n";
 
-    printf("%s",listaOpcoes1);
-    printf("%s",listaOpcoes2);
+    printf("%s", listaOpcoes1);
+    printf("%s", listaOpcoes2);
     printf("Digite uma opcao: ");
     scanf(" %c", &opcao);
 
@@ -289,5 +314,3 @@ leiaOpcao()
 
     return opcao;
 }
-
-
